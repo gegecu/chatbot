@@ -13,9 +13,9 @@ import java.time.LocalTime;
 public class Human {
     private Boolean hungry;
     private String cuisine;
-    private Float budget;
+    private Double budget;
     private String place;
-    private LocalTime duration;
+    private Integer duration;
     
     public Human() {
         this.hungry = null;
@@ -30,7 +30,7 @@ public class Human {
         return hungry;
     }
 
-    public void setHungry(boolean hungry) {
+    public void setHungry(Boolean hungry) {
         this.hungry = hungry;
     }
 
@@ -42,11 +42,11 @@ public class Human {
         this.cuisine = cuisine;
     }
 
-    public Float getBudget() {
+    public Double getBudget() {
         return budget;
     }
 
-    public void setBudget(float budget) {
+    public void setBudget(Double budget) {
         this.budget = budget;
     }
 
@@ -58,11 +58,11 @@ public class Human {
         this.place = place;
     }
 
-    public LocalTime getDuration() {
+    public Integer getDuration() {
         return duration;
     }
 
-    public void setDuration(LocalTime duration) {
+    public void setDuration(Integer duration) {
         this.duration = duration;
     }
     

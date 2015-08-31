@@ -32,6 +32,7 @@ public class Bot {
     private List<String> output;
     private Map<String, String> normalization;
     private Map<String, List<String>> replyOptions;
+    private List<Restaurant> restaurants;
     
     public Bot() {
         initialInput = "";
@@ -39,6 +40,7 @@ public class Bot {
         output = new ArrayList<String>();
         normalization = new HashMap<String, String>();
         replyOptions = new HashMap<String, List<String>>();
+        restaurants = new ArrayList<Restaurant>();
         init();
     }
     
@@ -69,21 +71,27 @@ public class Bot {
         }
         
         // adding reply knoweldge
-        List<String> cuisine = new ArrayList();
+        List<String> cuisine = new ArrayList<String>();
         cuisine.add("What cuisine you want to eat?");
         replyOptions.put("cuisine", cuisine);
         
-        List<String> budget = new ArrayList();
-        cuisine.add("How much is your budget for food?");
-        replyOptions.put("budget", budget);
-        
-        List<String> place = new ArrayList();
+        List<String> place = new ArrayList<String>();
         place.add("Where do you want to eat?");
         replyOptions.put("place", place);
         
-        List<String> time = new ArrayList();
+        List<String> budget = new ArrayList<String>();
+        budget.add("How much is your budget?");
+        replyOptions.put("budget", budget);
+        
+        List<String> time = new ArrayList<String>();
         time.add("How long can you eat?");
-        replyOptions.put("time", time);
+        replyOptions.put("duration", time);
+        
+        restaurants.add(new Restaurant("Chinese", (Double)150.0, "Agno", 30, "Wai Ying"));
+        restaurants.add(new Restaurant("Filipino", (Double)500.0, "Taft", 60, "Bascilogan"));
+        restaurants.add(new Restaurant("Spanish", (Double)250.0, "Agno", 30, "Something Spanish"));
+        
+        
     }
     
     public void normalize() {
@@ -137,6 +145,8 @@ public class Bot {
         List<String> replyOption = new ArrayList();
         String regex = "";
         String sentence = "";
+        String previousQuestion = "";
+        List<Restaurant> possibleRestaurants = new ArrayList();
         
         while(!end) {
             initialInput = in.nextLine();
@@ -179,8 +189,55 @@ public class Bot {
                 
                 else if(sentence.matches("i want (.*) cuisine")) {
                     if(man.isHungry() != null && man.isHungry()) {
+                    	if(man.getCuisine() != null && man.getCuisine().equals(sentence.split(" ")[2])) {
+                    		output.add("You already told me.");
+                    	} 
+                    	else {
+                    		output.add("I want " + sentence.split(" ")[2] + " cuisine too!");
+                    	}
                         man.setCuisine(sentence.split(" ")[2]);
-                        output.add("I want " + sentence.split(" ")[2] + " cuisine too!");
+                    } else {
+                        output.add("Ok.");
+                    }
+                }
+                
+                else if(sentence.matches("i want to eat at (.*)")) {
+                	if(man.isHungry() != null && man.isHungry()) {
+                    	if(man.getPlace() != null && man.getPlace().equals(sentence.split(" ")[5])) {
+                    		output.add("You already told me.");
+                    	} 
+                    	else {
+                    		output.add("I know restaurants in " + sentence.split(" ")[5] + "!");
+                    	}
+                        man.setPlace(sentence.split(" ")[5]);
+                    } else {
+                        output.add("Ok.");
+                    }
+                }
+                
+                else if(sentence.matches("my budget is (.*)")) {
+                	if(man.isHungry() != null && man.isHungry()) {
+                    	if(man.getBudget() != null && man.getBudget() == Float.parseFloat(sentence.split(" ")[3])) {
+                    		output.add("You already told me.");
+                    	} 
+                    	else {
+                    		output.add("I know restaurants that worth around " + sentence.split(" ")[3] + "!");
+                    	}
+                        man.setBudget(Double.parseDouble(sentence.split(" ")[3]));
+                    } else {
+                        output.add("Ok.");
+                    }
+                }
+                
+                else if(sentence.matches("i need (.*) minutes")) {
+                	if(man.isHungry() != null && man.isHungry()) {
+                    	if(man.getDuration() != null && man.getDuration() == Integer.parseInt(sentence.split(" ")[2])) {
+                    		output.add("You already told me.");
+                    	} 
+                    	else {
+                    		output.add("I know restaurants that serves around " + sentence.split(" ")[2] + "!");
+                    	}
+                        man.setDuration(Integer.parseInt(sentence.split(" ")[2]));
                     } else {
                         output.add("Ok.");
                     }
@@ -188,31 +245,60 @@ public class Bot {
             }
             
             if(!end) {
+            	
+            	replyOption.clear();
                 if(man.isHungry() == null) {
                     output.add("Are you hungry?");
                 }
                 else {
                     if(man.getCuisine() == null) {
+                    	//System.out.println("cuisine");
                         replyOption.addAll(replyOptions.get("cuisine"));
                     }
-                    if(man.getBudget() == null) {
-                        replyOption.addAll(replyOptions.get("budget"));
-                    }
                     if(man.getDuration() == null) {
-                        replyOption.addAll(replyOptions.get("time"));
+                    	//System.out.println("time");
+                        replyOption.addAll(replyOptions.get("duration"));
                     }
                     if(man.getPlace() == null) {
+                    	//System.out.println("place");
                         replyOption.addAll(replyOptions.get("place"));
                     }
+                    if(man.getBudget() == null) {
+                    	//System.out.println("budget");
+                    	replyOption.addAll(replyOptions.get("budget"));
+                    }
                 }
-
+                
                 if(replyOption.size() > 0) {
                     Random rand = new Random();
-                    int n = rand.nextInt(replyOption.size()) + 0;
+                    int n = rand.nextInt(replyOption.size());
                     output.add(replyOption.get(n));
                 }
 
-                replyOption.clear();
+                
+            }
+            
+            if(man.isHungry() && man.getBudget() != null && man.getCuisine() != null && man.getDuration() != null
+            		&& man.getPlace() != null) {
+            	
+            	System.out.println(man.getBudget() + ", " + man.getCuisine() + ", " + man.getDuration() + ", " + man.getPlace());
+            	
+            	for(int i = 0; i < restaurants.size(); i++) {
+            		if(restaurants.get(i).match(man.getCuisine(), (Double)man.getBudget(), man.getPlace(), man.getDuration())) {
+            			possibleRestaurants.add(restaurants.get(i));
+            		}
+            	}
+            	
+            	if(possibleRestaurants.size() > 0) {
+            		Random rand = new Random();
+                    int n = rand.nextInt(possibleRestaurants.size());
+                    output.add("You can eat at " + possibleRestaurants.get(n).getName());
+            	}
+            	else {
+            		output.add("Sorry, I cannot suggest restaurants matches all your preference.");
+            	}
+            	
+            	possibleRestaurants.clear();
             }
             
             for(int i = 0; i < output.size(); i++) {
@@ -221,7 +307,6 @@ public class Bot {
                 } else {
                     System.out.print(" " + output.get(i));
                 }
-                
             }
             
             System.out.println();
