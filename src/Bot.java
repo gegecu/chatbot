@@ -13,11 +13,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.regex.Pattern;
+
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 
@@ -142,11 +144,12 @@ public class Bot {
         Human man = new Human();
         boolean end = false;
         Scanner in = new Scanner(System.in);
-        List<String> replyOption = new ArrayList();
+        LinkedHashMap<String, List<String>> replyOption = new LinkedHashMap();
         String regex = "";
         String sentence = "";
         String previousQuestion = "";
         List<Restaurant> possibleRestaurants = new ArrayList();
+        Random rand = new Random();
         
         while(!end) {
             initialInput = in.nextLine();
@@ -188,6 +191,9 @@ public class Bot {
                 }
                 
                 else if(sentence.matches("i want (.*) cuisine")) {
+                	if(!previousQuestion.equalsIgnoreCase("cuisine")) {
+                		output.add("I did not ask you that.");
+                	}
                     if(man.isHungry() != null && man.isHungry()) {
                     	if(man.getCuisine() != null && man.getCuisine().equals(sentence.split(" ")[2])) {
                     		output.add("You already told me.");
@@ -202,6 +208,9 @@ public class Bot {
                 }
                 
                 else if(sentence.matches("i want to eat at (.*)")) {
+                	if(!previousQuestion.equalsIgnoreCase("place")) {
+                		output.add("I did not ask you that.");
+                	}
                 	if(man.isHungry() != null && man.isHungry()) {
                     	if(man.getPlace() != null && man.getPlace().equals(sentence.split(" ")[5])) {
                     		output.add("You already told me.");
@@ -216,6 +225,9 @@ public class Bot {
                 }
                 
                 else if(sentence.matches("my budget is (.*)")) {
+                	if(!previousQuestion.equalsIgnoreCase("budget")) {
+                		output.add("I did not ask you that.");
+                	}
                 	if(man.isHungry() != null && man.isHungry()) {
                     	if(man.getBudget() != null && man.getBudget() == Float.parseFloat(sentence.split(" ")[3])) {
                     		output.add("You already told me.");
@@ -230,6 +242,9 @@ public class Bot {
                 }
                 
                 else if(sentence.matches("i need (.*) minutes")) {
+                	if(!previousQuestion.equalsIgnoreCase("duration")) {
+                		output.add("I did not ask you that.");
+                	}
                 	if(man.isHungry() != null && man.isHungry()) {
                     	if(man.getDuration() != null && man.getDuration() == Integer.parseInt(sentence.split(" ")[2])) {
                     		output.add("You already told me.");
@@ -245,41 +260,51 @@ public class Bot {
             }
             
             if(!end) {
-            	
-            	replyOption.clear();
+
                 if(man.isHungry() == null) {
                     output.add("Are you hungry?");
                 }
                 else {
+
                     if(man.getCuisine() == null) {
                     	//System.out.println("cuisine");
-                        replyOption.addAll(replyOptions.get("cuisine"));
+                        replyOption.put("cuisine", replyOptions.get("cuisine"));
                     }
                     if(man.getDuration() == null) {
                     	//System.out.println("time");
-                        replyOption.addAll(replyOptions.get("duration"));
+                    	replyOption.put("duration", replyOptions.get("duration"));
                     }
                     if(man.getPlace() == null) {
                     	//System.out.println("place");
-                        replyOption.addAll(replyOptions.get("place"));
+                    	replyOption.put("place", replyOptions.get("place"));
                     }
                     if(man.getBudget() == null) {
                     	//System.out.println("budget");
-                    	replyOption.addAll(replyOptions.get("budget"));
+                    	replyOption.put("budget", replyOptions.get("budget"));
                     }
                 }
                 
                 if(replyOption.size() > 0) {
-                    Random rand = new Random();
                     int n = rand.nextInt(replyOption.size());
-                    output.add(replyOption.get(n));
+                    int counter = 0;
+                    for(Map.Entry<String, List<String>> entry: replyOption.entrySet()) {
+                    	if(counter == n) {
+                    		//System.out.println(entry.getKey());
+                    		int m = rand.nextInt(replyOption.get(entry.getKey()).size());
+                    		previousQuestion = entry.getKey();
+                    		//System.out.println(m);
+                    		output.add(replyOption.get(entry.getKey()).get(m));
+                    		break;
+                    	}
+                    	counter++;
+                	}
                 }
+                replyOption.clear();
 
-                
             }
             
             if(man.isHungry() && man.getBudget() != null && man.getCuisine() != null && man.getDuration() != null
-            		&& man.getPlace() != null) {
+            		&& man.getPlace() != null && !end) {
             	
             	System.out.println(man.getBudget() + ", " + man.getCuisine() + ", " + man.getDuration() + ", " + man.getPlace());
             	
@@ -290,7 +315,6 @@ public class Bot {
             	}
             	
             	if(possibleRestaurants.size() > 0) {
-            		Random rand = new Random();
                     int n = rand.nextInt(possibleRestaurants.size());
                     output.add("You can eat at " + possibleRestaurants.get(n).getName());
             	}
