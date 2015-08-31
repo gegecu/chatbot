@@ -306,7 +306,7 @@ public class Bot {
             if(man.isHungry() && man.getBudget() != null && man.getCuisine() != null && man.getDuration() != null
             		&& man.getPlace() != null && !end) {
             	
-            	System.out.println(man.getBudget() + ", " + man.getCuisine() + ", " + man.getDuration() + ", " + man.getPlace());
+            	//System.out.println(man.getBudget() + ", " + man.getCuisine() + ", " + man.getDuration() + ", " + man.getPlace());
             	
             	for(int i = 0; i < restaurants.size(); i++) {
             		if(restaurants.get(i).match(man.getCuisine(), (Double)man.getBudget(), man.getPlace(), man.getDuration())) {
