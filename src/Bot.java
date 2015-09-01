@@ -257,10 +257,7 @@ public class Bot {
                         output.add("Ok.");
                     }
                 }
-                
-                else {
-                	output.add("I don't get you.");
-                }
+ 
             }
             
             if(!end) {
@@ -311,7 +308,7 @@ public class Bot {
             }
             
             if(man.isHungry() && man.getBudget() != null && man.getCuisine() != null && man.getDuration() != null
-            		&& man.getPlace() != null && !end) {
+            		&& man.getPlace() != null) {
             	
             	//System.out.println(man.getBudget() + ", " + man.getCuisine() + ", " + man.getDuration() + ", " + man.getPlace());
             	
@@ -323,21 +320,31 @@ public class Bot {
             	
             	if(possibleRestaurants.size() > 0) {
             		
-                    int n = rand.nextInt(possibleRestaurants.size());
-                    output.add("You can eat at " + possibleRestaurants.get(n).getName());
+            		if(!previousQuestion.equalsIgnoreCase("restaurant") || (previousQuestion.equalsIgnoreCase("restaurant") && sentence.equalsIgnoreCase("no"))) {
+	                    int n = rand.nextInt(possibleRestaurants.size());
+	                    output.add("You can eat at " + possibleRestaurants.get(n).getName() + ". Is it a yes or no?");
+            		
+	                    for(int i = 0; i < restaurants.size(); i++) {
+	                		if(restaurants.get(i).getName().equals((possibleRestaurants.get(n).getName()))) {
+	                			restaurants.get(i).setSuggested(true);
+	                		}
+	                	}
+            		}
+            		else {
+            			output.add("I am now satisfied. Goodbye!");
+            			end = true;
+            		}
+            		
                     
-//                    for(int i = 0; i < restaurants.size(); i++) {
-//                		if(restaurants.get(i).getName().equals((possibleRestaurants.get(n).getName()))) {
-//                			restaurants.get(i).setSuggested(true);
-//                		}
-//                	}
+                    
             	}
             	else {
-            		output.add("Sorry, I cannot suggest restaurants matches all your preference.");
+            		output.add("Sorry, I cannot suggest restaurants matches all your preference. Goodbye!");
+            		end = true;
             	}
             	
             	possibleRestaurants.clear();
-            	System.exit(0);
+            	
             }
             
             for(int i = 0; i < output.size(); i++) {
