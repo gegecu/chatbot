@@ -7,6 +7,7 @@ public class Restaurant {
 	private String place;
 	private Integer averageServingTime;
 	private String name;
+	private boolean suggested;
 	
 	public Restaurant(String cuisine, Double averagePrice, String place, Integer averageServingTime, String name) {
 		this.cuisine = cuisine;
@@ -14,8 +15,17 @@ public class Restaurant {
 		this.place = place;
 		this.averageServingTime = averageServingTime;
 		this.name = name;
+		this.suggested = false;
 	}
 	
+	public boolean isSuggested() {
+		return suggested;
+	}
+
+	public void setSuggested(boolean suggested) {
+		this.suggested = suggested;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -50,7 +60,7 @@ public class Restaurant {
 	public Boolean match(String cuisine, Double price, String place, Integer duration) {
 		
 		if(this.cuisine.equalsIgnoreCase(cuisine) && this.averagePrice.equals(price)
-				&& this.place.equalsIgnoreCase(place) && duration.equals(this.averageServingTime)) {
+				&& this.place.equalsIgnoreCase(place) && duration.equals(this.averageServingTime) && !this.suggested) {
 			//System.out.println(this.averagePrice + ", " + this.cuisine + ", " + this.averageServingTime + ", " + this.place);
 			return true;
 		}

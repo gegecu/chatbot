@@ -257,12 +257,19 @@ public class Bot {
                         output.add("Ok.");
                     }
                 }
+                
+                else {
+                	output.add("I don't get you.");
+                }
             }
             
             if(!end) {
 
                 if(man.isHungry() == null) {
                     output.add("Are you hungry?");
+                }
+                else if(!man.isHungry()) {
+                	output.add("Why are you not hungry?");
                 }
                 else {
 
@@ -315,14 +322,22 @@ public class Bot {
             	}
             	
             	if(possibleRestaurants.size() > 0) {
+            		
                     int n = rand.nextInt(possibleRestaurants.size());
                     output.add("You can eat at " + possibleRestaurants.get(n).getName());
+                    
+//                    for(int i = 0; i < restaurants.size(); i++) {
+//                		if(restaurants.get(i).getName().equals((possibleRestaurants.get(n).getName()))) {
+//                			restaurants.get(i).setSuggested(true);
+//                		}
+//                	}
             	}
             	else {
             		output.add("Sorry, I cannot suggest restaurants matches all your preference.");
             	}
             	
             	possibleRestaurants.clear();
+            	System.exit(0);
             }
             
             for(int i = 0; i < output.size(); i++) {
